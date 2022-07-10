@@ -48,23 +48,6 @@ class DashboardCard07Class extends React.Component {
               {/* Table body */}
               <tbody className="text-sm font-medium divide-y divide-slate-100">
                 {/* Row */}
-                <tr>
-                  <td className="p-2">
-                    <div className="flex items-center">
-                      <div className="text-slate-800">FCABUS31 </div>
-                    </div>
-                  </td>
-                  <td className="p-2">
-                    <div className="text-left">BOCA RAgfsdgfsgfsTON,FL</div>
-                  </td>
-                  <td className="p-2">
-                    <div className="text-center text-green-500">$3,877</div>
-                  </td>
-                  <td className="p-2">
-                    <div className="text-center text-sky-500">USD</div>
-                  </td>
-                </tr>
-
                 {payments.map(payment => (
                   <tr>
                     <td className="p-2">
