@@ -10,21 +10,9 @@ import './css/style.scss';
 import './charts/ChartjsConfig';
 
 // Import pages
-import Dashboard from './pages/Dashboard';
+import DashboardClass from './pages/DashboardClass';
 
 function App() {
-
-  const location = useLocation();
-
-  fetch('http://localhost:8080/all')
-  .then((response) => response.json())
-  .then((json) => {
-    console.log(json);
-  })
-  .catch((error) => {
-    console.error(error);
-  });
-
 
   useEffect(() => {
     document.querySelector('html').style.scrollBehavior = 'auto'
@@ -35,7 +23,7 @@ function App() {
   return (
     <>
       <Routes>
-        <Route exact path="/" element={<Dashboard />} />
+        <Route exact path="/" element={<DashboardClass />} />
       </Routes>
     </>
   );

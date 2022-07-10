@@ -1,8 +1,4 @@
-import React, { useState } from 'react';
 
-import DashboardCard04 from '../partials/dashboard/DashboardCard04';
-import DashboardCard05 from '../partials/dashboard/DashboardCard05';
-import DashboardCard06 from '../partials/dashboard/DashboardCard06';
 import DashboardCard07 from '../partials/dashboard/DashboardCard07';
 
 function Dashboard() {
@@ -21,14 +17,10 @@ function Dashboard() {
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
 
-              <DashboardCard04 />
-              {/* Line chart (Real Time Value) */}
-              <DashboardCard05 />
-              {/* Table (Top Channels) */}
-              <DashboardCard07 />
-              {/* Doughnut chart (Top Countries) */}
-              <DashboardCard06 />
-
+            <DashboardCard04 />
+            <DashboardCard05 />
+            <DashboardCard06 />
+            <DashboardCard07 />
               
             </div>
 
