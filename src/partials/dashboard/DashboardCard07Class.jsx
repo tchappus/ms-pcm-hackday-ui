@@ -49,22 +49,22 @@ class DashboardCard07Class extends React.Component {
               <tbody className="text-sm font-medium divide-y divide-slate-100">
                 {/* Row */}
                 {payments.map(payment => (
-                  <tr>
+                  <tr key="{payment.id}">
                     <td className="p-2">
                       <div className="flex items-center">
-                        <div className="text-slate-800" key="{payment.id}" >{payment.bic} </div>
+                        <div className="text-slate-800"  >{payment.bic } </div>
                       </div>
                     </td>
                     <td className="p-2">
                       <div className="flex items-center">
-                        <div className="text-slate-800" key="{payment.id}" >{payment.name} </div>
+                        <div className="text-slate-800">{payment.name} </div>
                       </div>
                     </td>
                     <td className="p-2">
-                      <div className="text-center text-green-500" key="{payment.id}" >${payment.amount} </div>
+                      <div className="text-center text-green-500">${payment.amount} </div>
                     </td>
                     <td className="p-2">
-                      <div className="text-center text-sky-500" key="{payment.id}" >{payment.currency}</div>
+                      <div className="text-center text-sky-500"  >{payment.currency}</div>
                     </td>
                   </tr>
                 ))}

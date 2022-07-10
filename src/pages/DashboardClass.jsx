@@ -18,12 +18,10 @@ class DashboardClass extends React.Component {
 
               {/* Cards */}
               <div className="grid grid-cols-12 gap-6">
-              <DashboardCard06Class />
               <DashboardCard04Class />
+              <DashboardCard05Class />
+              <DashboardCard06Class />
               <DashboardCard07Class />
-                {/* /> 
-                <DashboardCard04Class />
-                <DashboardCard07Class /> */}
               </div>
 
             </div>
