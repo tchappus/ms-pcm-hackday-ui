@@ -47,7 +47,7 @@ function BarChart01({
           x: {
             type: 'time',
             time: {
-              parser: 'MM-DD-YYYY',
+              parser: 'YYYY-MM-DD',
               unit: 'month',
               displayFormats: {
                 month: 'MMM YY',
@@ -75,12 +75,13 @@ function BarChart01({
           mode: 'nearest',
         },
         animation: {
-          duration: 500,
+          duration: 100,
         },
         maintainAspectRatio: false,
         resizeDelay: 200,
       },
-      plugins: [{
+      plugins: [
+        {
         id: 'htmlLegend',
         afterUpdate(c, args, options) {
           const ul = legend.current;
@@ -145,7 +146,7 @@ function BarChart01({
     });
     return () => chart.destroy();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [data]);
 
   return (
     <React.Fragment>

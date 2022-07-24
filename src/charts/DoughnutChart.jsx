@@ -40,7 +40,7 @@ function DoughnutChart({
           mode: 'nearest',
         },
         animation: {
-          duration: 500,
+          duration: 50,
         },
         maintainAspectRatio: false,
         resizeDelay: 200,

@@ -1,55 +1,123 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import BarChart from '../../charts/BarChart01';
 
 // Import utilities
 import { tailwindConfig } from '../../utils/Utils';
 
-class DashboardCard04Class extends React.Component {
+export default ({ paymentSubject }) => {
 
-  render() {
+  const [chartData, setChartData] = useState({
+    labels: ['2022-07-23'],
+    datasets: [
+      // Light blue bars
+      {
+        label: 'Pay',
+        data: [0],
+        backgroundColor: tailwindConfig().theme.colors.blue[400],
+        hoverBackgroundColor: tailwindConfig().theme.colors.blue[500],
+        barPercentage: 0.66,
+        categoryPercentage: 0.66,
+      },
+      // Blue bars
+      {
+        label: 'Receive',
+        data: [0],
+        backgroundColor: tailwindConfig().theme.colors.indigo[500],
+        hoverBackgroundColor: tailwindConfig().theme.colors.indigo[600],
+        barPercentage: 0.66,
+        categoryPercentage: 0.66,
+      },
+    ],
+  });
 
-    const chartData = {
-      labels: [
-        '12-01-2020', '01-01-2021', '02-01-2021',
-        '03-01-2021', '04-01-2021', '05-01-2021',
-      ],
-      datasets: [
-        // Light blue bars
-        {
-          label: 'Pay',
-          data: [
-            800, 1600, 900, 1300, 1950, 1700,
+  useEffect(() => {
+    const payments = [];
+    paymentSubject.subscribe({
+      next: payment => {
+        payments.push(payment);
+
+        const dates = new Set();
+        const pay = new Map();
+        const receive = new Map();
+
+        console.log(payment);
+
+        for (const payment of payments) {
+          const date = payment["timestamp"].split("T")[0];
+
+          if (dates.has(date)) {
+            if (payment["direction"] == "into") {
+              receive.set(date, receive.get(date) + payment["amount"]);
+            } else {
+              pay.set(date, pay.get(date) + payment["amount"]);
+            }
+          } else {
+            pay.set(date, 0);
+            receive.set(date, 0);
+            dates.add(date);
+            if (payment["direction"] == "into") {
+              receive.set(date, payment["amount"]);
+            } else {
+              pay.set(date, payment["amount"]);
+            }
+          }
+        }
+
+        const datesArray = Array.from(dates).sort();
+        const payValues = [];
+        const receiveValues = [];
+
+        for (const date of datesArray) {
+          if (pay.has(date)) {
+            payValues.push(pay.get(date));
+          } else {
+            payValues.push(0);
+          }
+
+          if (receive.has(date)) {
+            receiveValues.push(receive.get(date));
+          } else {
+            receiveValues.push(0);
+          }
+        }
+        const chartData = {
+          labels: datesArray,
+          datasets: [
+            // Light blue bars
+            {
+              label: 'Pay',
+              data: payValues,
+              backgroundColor: tailwindConfig().theme.colors.blue[400],
+              hoverBackgroundColor: tailwindConfig().theme.colors.blue[500],
+              barPercentage: 0.66,
+              categoryPercentage: 0.66,
+            },
+            // Blue bars
+            {
+              label: 'Receive',
+              data: receiveValues,
+              backgroundColor: tailwindConfig().theme.colors.indigo[500],
+              hoverBackgroundColor: tailwindConfig().theme.colors.indigo[600],
+              barPercentage: 0.66,
+              categoryPercentage: 0.66,
+            },
           ],
-          backgroundColor: tailwindConfig().theme.colors.blue[400],
-          hoverBackgroundColor: tailwindConfig().theme.colors.blue[500],
-          barPercentage: 0.66,
-          categoryPercentage: 0.66,
-        },
-        // Blue bars
-        {
-          label: 'Receive',
-          data: [
-            4900, 2600, 5350, 4800, 5200, 4800,
-          ],
-          backgroundColor: tailwindConfig().theme.colors.indigo[500],
-          hoverBackgroundColor: tailwindConfig().theme.colors.indigo[600],
-          barPercentage: 0.66,
-          categoryPercentage: 0.66,
-        },
-      ],
-    };
+        };
+        console.log(chartData);
+        setChartData(chartData);
+      }
+    });
+  }, []);
 
-    return (
-      <div className="flex flex-col col-span-full sm:col-span-6 bg-white shadow-lg rounded-sm border border-slate-200">
-        <header className="px-5 py-4 border-b border-slate-100">
-          <h2 className="font-semibold text-slate-800">Pay VS Receive</h2>
-        </header>
-        {/* Chart built with Chart.js 3 */}
-        {/* Change the height attribute to adjust the chart height */}
-        <BarChart data={chartData} width={595} height={248} />
-      </div>
-    );
-  }
-}
 
-export default DashboardCard04Class;
+  return (
+    <div className="flex flex-col col-span-full sm:col-span-6 bg-white shadow-lg rounded-sm border border-slate-200">
+      <header className="px-5 py-4 border-b border-slate-100">
+        <h2 className="font-semibold text-slate-800">Pay VS Receive</h2>
+      </header>
+      {/* Chart built with Chart.js 3 */}
+      {/* Change the height attribute to adjust the chart height */}
+      <BarChart data={chartData} width={595} height={248} />
+    </div>
+  );
+};
