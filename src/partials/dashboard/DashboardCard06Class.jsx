@@ -3,7 +3,7 @@ import DoughnutChart from '../../charts/DoughnutChart';
 
 import { tailwindConfig } from '../../utils/Utils';
 
-export default ({ paymentSubject }) => {
+export default ({ paymentSubject, initialPaymentSubject }) => {
 
   const [chartData, setChartData] = useState({
     labels: [],
@@ -27,52 +27,69 @@ export default ({ paymentSubject }) => {
   });
 
   useEffect(() => {
-    const payments = [];
-    paymentSubject.subscribe({
-      next: payment => {
-        payments.push(payment);
 
-        const currencies = new Set();
-        const amounts = new Map();
+    const currencies = new Set();
+    const amounts = new Map();
+
+    const processPayment = (payment) => {
+      currencies.add(payment["currency"]);
+
+      if (amounts.has(payment["currency"])) {
+        amounts.set(payment["currency"], amounts.get(payment["currency"]) + payment["amount"]);
+      } else {
+        amounts.set(payment["currency"], payment["amount"]);
+      }
+    };
+
+    const produceChartData = () => {
+      const currenciesArray = Array.from(currencies).sort();
+      const amountsArray = [];
+
+      for (const curr of currencies) {
+        amountsArray.push(amounts.get(curr));
+      }
+
+      return {
+        labels: currenciesArray,
+        datasets: [
+          {
+            label: 'Top currencies',
+            data: amountsArray,
+            backgroundColor: [
+              tailwindConfig().theme.colors.indigo[500],
+              tailwindConfig().theme.colors.blue[400],
+              tailwindConfig().theme.colors.indigo[800],
+            ],
+            hoverBackgroundColor: [
+              tailwindConfig().theme.colors.indigo[600],
+              tailwindConfig().theme.colors.blue[500],
+              tailwindConfig().theme.colors.indigo[900],
+            ],
+            hoverBorderColor: tailwindConfig().theme.colors.white,
+          },
+        ],
+      };
+    }
+
+    initialPaymentSubject.subscribe({
+      next: payments => {
 
         for (const payment of payments) {
-          currencies.add(payment["currency"]);
+          processPayment(payment);
+        }
+        
+        setChartData(produceChartData());
 
-          if (amounts.has(payment["currency"])) {
-            amounts.set(payment["currency"], amounts.get(payment["currency"]) + payment["amount"]);
-          } else {
-            amounts.set(payment["currency"], payment["amount"]);
+        paymentSubject.subscribe({
+          next: payment => {
+            processPayment(payment);
+            setChartData(produceChartData());
           }
-        }
-
-        const currenciesArray = Array.from(currencies).sort();
-        const amountsArray = [];
-
-        for (const curr of currencies) {
-          amountsArray.push(amounts.get(curr));
-        }
-        setChartData({
-          labels: currenciesArray,
-          datasets: [
-            {
-              label: 'Top currencies',
-              data: amountsArray,
-              backgroundColor: [
-                tailwindConfig().theme.colors.indigo[500],
-                tailwindConfig().theme.colors.blue[400],
-                tailwindConfig().theme.colors.indigo[800],
-              ],
-              hoverBackgroundColor: [
-                tailwindConfig().theme.colors.indigo[600],
-                tailwindConfig().theme.colors.blue[500],
-                tailwindConfig().theme.colors.indigo[900],
-              ],
-              hoverBorderColor: tailwindConfig().theme.colors.white,
-            },
-          ],
         });
       }
-    })
+    });
+
+    
   }, []);
 
 

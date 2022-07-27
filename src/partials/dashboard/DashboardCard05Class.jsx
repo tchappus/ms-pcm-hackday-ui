@@ -5,7 +5,7 @@ import RealtimeChart from '../../charts/RealtimeChart';
 // Import utilities
 import { tailwindConfig, hexToRGB } from '../../utils/Utils';
 
-export default ({ paymentSubject }) => {
+export default ({ paymentSubject, initialPaymentSubject }) => {
 
   const [chartData, setChartData] = useState({
     labels: [],
@@ -27,55 +27,65 @@ export default ({ paymentSubject }) => {
   });
 
   useEffect(() => {
-    const payments = [];
-    paymentSubject.subscribe({
-      next: payment => {
-        payments.push(payment);
+    
+    const timestamps = []
+    const values = [];
+    let value = 0;
 
-        const timestamps = []
-        const values = [];
-        let value = 0;
+    const processPayment = (payment) => {
+      const timestamp = payment["timestamp"];
+
+      if (payment["direction"] == "into") {
+        value += payment["amount"];
+      } else {
+        value -= payment["amount"];
+      }
+
+      values.push(value);
+      timestamps.push(timestamp);
+    };
+
+    const produceChartData = () => {
+      return {
+        labels: timestamps,
+        datasets: [
+          // Indigo line
+          {
+            data: values,
+            fill: true,
+            backgroundColor: `rgba(${hexToRGB(tailwindConfig().theme.colors.blue[500])}, 0.08)`,
+            borderColor: tailwindConfig().theme.colors.indigo[500],
+            borderWidth: 2,
+            tension: 0,
+            pointRadius: 0,
+            pointHoverRadius: 3,
+            pointBackgroundColor: tailwindConfig().theme.colors.indigo[500],
+            clip: 20,
+          },
+        ],
+      };
+    };
+
+    initialPaymentSubject.subscribe({
+      next: payments => {
 
         for (const payment of payments) {
-          
-          const date = payment["timestamp"].split("T")[0];
-
-          if (date != '2022-07-23') {
-            continue;
-          }
-
-          const timestamp = payment["timestamp"].split("T")[1].substring(0, 8);
-
-          if (payment["direction"] == "into") {
-            value += payment["amount"];
-          } else {
-            value -= payment["amount"];
-          }
-
-          values.push(value);
-          timestamps.push(timestamp);
+          processPayment(payment);
         }
 
-        setChartData({
-          labels: timestamps,
-          datasets: [
-            // Indigo line
-            {
-              data: values,
-              fill: true,
-              backgroundColor: `rgba(${hexToRGB(tailwindConfig().theme.colors.blue[500])}, 0.08)`,
-              borderColor: tailwindConfig().theme.colors.indigo[500],
-              borderWidth: 2,
-              tension: 0,
-              pointRadius: 0,
-              pointHoverRadius: 3,
-              pointBackgroundColor: tailwindConfig().theme.colors.indigo[500],
-              clip: 20,
-            },
-          ],
+        setChartData(produceChartData());
+
+        paymentSubject.subscribe({
+          next: payment => {
+            processPayment(payment);
+    
+            setChartData(produceChartData());
+          }
         });
       }
     });
+
+    
   }, []);
 
 

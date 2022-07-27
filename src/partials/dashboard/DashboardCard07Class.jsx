@@ -1,22 +1,36 @@
 import React, { useEffect, useState } from 'react';
 
-export default ({ paymentSubject }) => {
+export default ({ paymentSubject, initialPaymentSubject }) => {
 
   const [payments, setPayments] = useState([]);
 
   useEffect(() => {
     const paymentsArr = [];
 
-    paymentSubject.subscribe({
-      next: (payment) => {
-        paymentsArr.push(payment);
-        if (paymentsArr.length > 10) {
-          paymentsArr.shift();
+    const generateTable = () => {
+      const tableData = paymentsArr.slice(paymentsArr.length - 10);
+      tableData.reverse();
+
+      return tableData;
+    }
+
+    initialPaymentSubject.subscribe({
+      next: (payments) => {
+        for (const payment of payments) {
+          paymentsArr.push(payment);
         }
-        paymentsArr.reverse();
-        setPayments([...paymentsArr]);
+        setPayments(generateTable());
+
+        paymentSubject.subscribe({
+          next: (payment) => {
+            paymentsArr.push(payment);
+            setPayments(generateTable());
+          }
+        });
       }
     });
+
+    
   }, []);
 
   return (
@@ -73,10 +87,10 @@ export default ({ paymentSubject }) => {
                     </div>
                   </td>
                   <td className="p-2">
-                  {payment.direction == "into" &&
+                  {payment.direction === "into" &&
                     <div className="text-right text-green-500">{payment.amount.toFixed(2)}</div>
                   }
-                  {payment.direction != "into" &&
+                  {payment.direction !== "into" &&
                     <div className="text-right text-red-500">({payment.amount.toFixed(2)})</div>
                   }
                   </td>

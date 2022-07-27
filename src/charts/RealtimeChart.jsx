@@ -45,11 +45,12 @@ function RealtimeChart({
           x: {
             type: 'time',
             time: {
-              parser: 'hh:mm:ss',
-              unit: 'second',
+              parser: 'YYYY-MM-DDThh:mm:ss',
+              unit: 'minute',
               tooltipFormat: 'MMM DD, H:mm:ss a',
               displayFormats: {
                 second: 'H:mm:ss',
+                minute: 'MMM DD, H:mm'
               },
             },
             grid: {

@@ -7,9 +7,18 @@ import DashboardCard07Class from '../partials/dashboard/DashboardCard07Class';
 
 export default () => {
   const paymentSubject = new Subject();
+  const initialPaymentSubject = new Subject();
 
   useEffect(() => {
-    const paymentEvtSrc = new EventSource('http://localhost:8082/payments-test');
+
+    fetch("http://localhost:8080/payments/all")
+      .then(resp => resp.json())
+      .then(body => {
+        console.log(body);
+        initialPaymentSubject.next(body);
+      });
+
+    const paymentEvtSrc = new EventSource('http://localhost:8080/payments');
     paymentEvtSrc.onmessage = function (event) {
       paymentSubject.next(JSON.parse(event.data));
     }
@@ -26,10 +35,10 @@ export default () => {
 
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
-              <DashboardCard04Class paymentSubject={paymentSubject} />
-              <DashboardCard05Class paymentSubject={paymentSubject} />
-              <DashboardCard06Class paymentSubject={paymentSubject} />
-              <DashboardCard07Class paymentSubject={paymentSubject} />
+              <DashboardCard04Class paymentSubject={paymentSubject} initialPaymentSubject={initialPaymentSubject} />
+              <DashboardCard05Class paymentSubject={paymentSubject} initialPaymentSubject={initialPaymentSubject} />
+              <DashboardCard06Class paymentSubject={paymentSubject} initialPaymentSubject={initialPaymentSubject} />
+              <DashboardCard07Class paymentSubject={paymentSubject} initialPaymentSubject={initialPaymentSubject} />
             </div>
 
           </div>
