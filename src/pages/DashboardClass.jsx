@@ -11,14 +11,14 @@ export default () => {
 
   useEffect(() => {
 
-    fetch("http://localhost:8080/payments/all")
+    fetch("http://payment-apps42-api.westus.azurecontainer.io/payments/all")
       .then(resp => resp.json())
       .then(body => {
         console.log(body);
         initialPaymentSubject.next(body);
       });
 
-    const paymentEvtSrc = new EventSource('http://localhost:8080/payments');
+    const paymentEvtSrc = new EventSource('http://payment-apps42-api.westus.azurecontainer.io/payments');
     paymentEvtSrc.onmessage = function (event) {
       paymentSubject.next(JSON.parse(event.data));
     }
